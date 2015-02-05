@@ -1,6 +1,5 @@
 /* @flow */
 
-
 type PRED = (_:any) => boolean;
 
 function pipeline<A, B, C>(fn1: ((_: A) => B), fn2: ((_:B) => C) ) : ( (_:A) => C ) {
@@ -12,16 +11,24 @@ function pipeline<A, B, C>(fn1: ((_: A) => B), fn2: ((_:B) => C) ) : ( (_:A) => 
 function kestrel<A, B>(x: B) : ((_:A) => B) {
     return function(y) {
         return x;
-    }
+    };
 };
 
-function partial<A, B, C>(fn: ( (_: A, _: B) => C), x: A) : ( (_:B) => C ) {
+function starling<A, B, C>(fun1: ((_:A, _:B) => C), fun2 : ((_:A) => B)): ((_:A) => C) {
+    return function(x) {
+        return fun1(x, fun2(x));
+    };
+};
+
+function identity<A>(x: A) : A {
+    return x;
+};
+
+function partial2<A, B, C>(fn: ( (_: A, _: B) => C), x: A) : ( (_:B) => C ) {
     return function(y) {
         return fn(x, y);
     };
 };
-
-function curry2<A, B>
 
 function range(start:number, end:number, step=1) : Array<number> {
     var result = [];
@@ -70,3 +77,20 @@ function concat<A>(one:Array<A>, two:Array<A>): Array<A> {
     }
     return result;
 }
+
+function any<A>(test : PRED, haystack: Array<A>) : boolean {
+    var result = false;
+    for(var i = 0; i < haystack.length; i++) {
+        if (test(haystack[i])) {
+            result = true;
+            break;
+        }
+    }
+    return result;
+};
+
+function negate<A>(fn : ((_:A) => boolean)) : ((_:A) => boolean) {
+    return function(x) {
+        return !(fn(x));
+    };
+};
